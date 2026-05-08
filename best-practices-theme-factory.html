@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Best Practices — Theme Factory — Agentic Anatta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8251A;
+    --red-dark: #8B0000;
+    --white: #0D0B09;
+    --blue: #1A3A6B;
+    --gold: #C8860A;
+    --bg: #F5F2EE;
+    --bg2: #E8E4DF;
+    --bg3: #DDD8D2;
+    --text: #0D0B09;
+    --muted: rgba(13,11,9,0.5);
+    --sidebar-w: 260px;
+  }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 60px;
+    background: rgba(245,242,238,0.97);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .nav-shield { width: 36px; height: 36px; }
+
+  .nav-wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .nav-wordmark span {
+    color: var(--red);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    display: block;
+    margin-top: -4px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a.active { color: var(--red); }
+
+  /* NAV DROPDOWN */
+  .nav-dropdown { position: relative; }
+  .nav-dropdown > a::after {
+    content: ' \25BE';
+    font-size: 9px;
+    opacity: 0.5;
+  }
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    padding: 8px 0;
+    min-width: 180px;
+    border-radius: 4px;
+    list-style: none;
+  }
+  .nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+  .nav-dropdown-menu li a {
+    display: block;
+    padding: 8px 20px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .nav-dropdown-menu li a:hover {
+    background: rgba(0,0,0,0.05);
+  }
+
+  /* HAMBURGER */
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--white);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .nav-toggle.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle.active span:nth-child(2) { opacity: 0; }
+  .nav-toggle.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* LAYOUT */
+  .docs-layout {
+    display: flex;
+    margin-top: 85px;
+    min-height: calc(100vh - 85px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    position: fixed;
+    top: 85px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    padding: 32px 24px 60px;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    background: var(--bg);
+    z-index: 50;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+
+  .sidebar-group { margin-bottom: 28px; }
+
+  .sidebar-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 12px;
+  }
+
+  .sidebar-link {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 12px;
+    border-left: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .sidebar-link:hover { color: var(--white); }
+  .sidebar-link.active {
+    color: var(--white);
+    border-left-color: var(--red);
+  }
+
+  .sidebar-link code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* MOBILE SIDEBAR TOGGLE */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 200;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--red);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(232,37,26,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* CONTENT */
+  .docs-content {
+    flex: 1;
+    margin-left: var(--sidebar-w);
+    padding: 48px 60px 120px;
+    max-width: 900px;
+  }
+
+  /* HERO */
+  .docs-hero {
+    margin-bottom: 64px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .docs-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    border: 1px solid rgba(232,37,26,0.3);
+    padding: 6px 16px;
+    margin-bottom: 24px;
+  }
+
+  .docs-hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: 3px;
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .docs-hero-title em {
+    font-style: normal;
+    color: var(--red);
+  }
+
+  .docs-hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 520px;
+  }
+
+  /* SECTION HEADINGS */
+  .doc-section {
+    margin-bottom: 64px;
+  }
+
+  .doc-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .doc-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+
+  .doc-section h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .doc-section h3:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .doc-section h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  /* PROSE */
+  .doc-section p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .doc-section p strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .doc-section ul, .doc-section ol {
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+
+  .doc-section li {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .doc-section li strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .doc-section a {
+    color: var(--red);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .doc-section a:hover {
+    color: var(--white);
+  }
+
+  /* INLINE CODE */
+  .doc-section code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: rgba(232,37,26,0.08);
+    color: var(--red);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .code-block-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.14);
+  }
+
+  .code-block pre {
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgba(13,11,9,0.7);
+  }
+
+  .code-block pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+  }
+
+  .code-block .prompt { color: var(--red); }
+  .code-block .cmd { color: var(--white); }
+  .code-block .flag { color: rgba(232,37,26,0.6); }
+  .code-block .comment { color: rgba(13,11,9,0.3); font-style: italic; }
+  .code-block .success { color: #4ade80; }
+  .code-block .key { color: var(--red); }
+  .code-block .str { color: rgba(13,11,9,0.6); }
+
+  /* TABLES */
+  .doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+
+  .doc-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    font-weight: 500;
+  }
+
+  .doc-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: var(--muted);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+
+  .doc-table td code {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: rgba(232,37,26,0.08);
+    color: var(--red);
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .doc-table tr:hover td { background: rgba(0,0,0,0.03); }
+
+  /* CALLOUT */
+  .doc-callout {
+    border: 1px solid rgba(232,37,26,0.2);
+    background: rgba(232,37,26,0.03);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+
+  .doc-callout p {
+    margin-bottom: 0;
+  }
+
+  .doc-callout strong {
+    color: var(--red);
+  }
+
+  /* TIP CALLOUT */
+  .doc-tip {
+    border: 1px solid rgba(74,222,128,0.2);
+    background: rgba(74,222,128,0.03);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+
+  .doc-tip p {
+    margin-bottom: 0;
+  }
+
+  .doc-tip strong {
+    color: #4ade80;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: var(--sidebar-w);
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .footer-mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: rgba(0,0,0,0.18);
+  }
+
+  /* ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* TABLET */
+  @media (max-width: 1024px) {
+    nav { padding: 20px 32px; }
+    .sidebar { width: 220px; min-width: 220px; padding: 24px 16px 60px; }
+    .docs-content { margin-left: 220px; padding: 40px 32px 100px; }
+    footer { margin-left: 220px; padding: 36px 32px; }
+    .doc-section h2 { font-size: 34px; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-toggle { display: flex; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--bg2);
+      flex-direction: column;
+      padding: 80px 32px 32px;
+      gap: 24px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 150;
+      border-left: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-links.open { transform: translateX(0); }
+    .nav-links a { font-size: 13px; }
+
+    .nav-dropdown-menu {
+      display: block;
+      position: static;
+      transform: none;
+      background: none;
+      border: none;
+      padding: 0 0 0 16px;
+      min-width: 0;
+    }
+    .nav-dropdown > a::after { display: none; }
+    .nav-dropdown-menu li a { padding: 4px 0; }
+    .nav-dropdown-menu li a:hover { background: none; }
+
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      width: 280px;
+      min-width: 280px;
+      z-index: 90;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-toggle { display: flex; }
+
+    .docs-content { margin-left: 0; padding: 32px 20px 80px; }
+    footer { margin-left: 0; padding: 32px 20px; flex-direction: column; gap: 12px; text-align: center; }
+
+    .docs-hero-title { font-size: 40px; }
+    .doc-section h2 { font-size: 30px; }
+    .doc-section h3 { font-size: 22px; }
+
+    .doc-table { font-size: 12px; }
+    .doc-table th, .doc-table td { padding: 8px 10px; }
+
+    .code-block pre { font-size: 11px; padding: 14px 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .docs-hero-title { font-size: 32px; }
+    .code-block pre { font-size: 10px; padding: 12px 14px; }
+    .doc-table { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg class="nav-shield" viewBox="165 45 350 350" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="340" cy="220" r="175" fill="#CC1E1E"/>
+      <circle cx="340" cy="220" r="125" fill="#F0F0F0"/>
+      <circle cx="340" cy="220" r="80" fill="#1A3A6B"/>
+      <polygon points="305,275 323,275 360,165 342,165" fill="white"/>
+      <circle cx="368" cy="233" r="15" fill="white"/>
+      <circle cx="340" cy="220" r="175" fill="none" stroke="#8B0000" stroke-width="2.5"/>
+    </svg>
+    <div class="nav-wordmark">
+      Agentic Anatta
+      <span>An AI Initiative</span>
+    </div>
+  </a>
+  <button class="nav-toggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li class="nav-dropdown">
+      <a href="theme-factory.html">Theme Factory</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-theme-factory.html">Docs</a></li>
+        <li><a href="best-practices-theme-factory.html" class="active">Best Practices</a></li>
+      </ul>
+    </li>
+    <li class="nav-dropdown">
+      <a href="jarvis.html">Jarvis</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-jarvis.html">Docs</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Strategy</div>
+    <a href="#task-strategy" class="sidebar-link">Section-by-Section Approach</a>
+    <a href="#build-order" class="sidebar-link">Build Order</a>
+    <a href="#splitting-pages" class="sidebar-link">Splitting Full Pages</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Task Files</div>
+    <a href="#writing-tasks" class="sidebar-link">Keep It Minimal</a>
+    <a href="#specify-metadata" class="sidebar-link">Always Specify Metadata</a>
+    <a href="#behavior-not-style" class="sidebar-link">Behavior, Not Style</a>
+    <a href="#match-detail-to-scope" class="sidebar-link">Match Detail to Scope</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Figma</div>
+    <a href="#figma-links" class="sidebar-link">Mobile + Desktop Together</a>
+    <a href="#figma-limit" class="sidebar-link">Don't Overload Links</a>
+    <a href="#figma-context" class="sidebar-link">Reference Links for Context</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Pipeline vs Chat</div>
+    <a href="#when-pipeline" class="sidebar-link">When to Use Pipeline</a>
+    <a href="#when-chat" class="sidebar-link">When to Use Chat</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">While Running</div>
+    <a href="#hands-off" class="sidebar-link">Don't Touch Shopify Admin</a>
+    <a href="#chat-save-warning" class="sidebar-link">Chat &amp; Saving</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Iteration</div>
+    <a href="#follow-ups" class="sidebar-link">Follow-Up Tasks</a>
+    <a href="#batch-fixes" class="sidebar-link">Batching Fixes</a>
+    <a href="#play-with-emotion" class="sidebar-link">Tone Matters</a>
+  </div>
+</aside>
+
+<!-- SIDEBAR TOGGLE (mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
+  &#9776;
+</button>
+
+<!-- CONTENT -->
+<main class="docs-layout">
+  <div class="docs-content">
+
+    <!-- HERO -->
+    <div class="docs-hero">
+      <span class="docs-tag">Guide</span>
+      <h1 class="docs-hero-title">Best <em>Practices</em></h1>
+      <p class="docs-hero-sub">
+        Practical guidance for getting the best results from Theme Factory. How to write effective tasks, structure your work, and avoid common mistakes.
+      </p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TASK STRATEGY -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="task-strategy">
+      <p class="doc-section-label">Strategy</p>
+      <h2>Section-by-Section Approach</h2>
+
+      <p>Don't try to build an entire page in one task. Theme Factory works best when each task focuses on <strong>a single section</strong> — a hero, a product carousel, a reviews block, etc. This keeps the agent focused, the validation precise, and the output reviewable.</p>
+
+      <p>One section per task means:</p>
+      <ul>
+        <li>The agent has clear scope and doesn't try to do too much</li>
+        <li>You can review and approve each section before moving on</li>
+        <li>If something goes wrong, you only redo one piece — not the whole page</li>
+      </ul>
+
+      <h3 id="build-order">Build Order</h3>
+
+      <p>When building a theme from scratch, follow this order so each task builds on the foundation of the previous one:</p>
+
+      <ol>
+        <li><strong>Style guide first</strong> — color schemes, typography, spacing, buttons. This sets the design system for everything that follows.</li>
+        <li><strong>Header and footer</strong> — the global frame. If they're complex (mega-menu, multi-level footer), split them into separate tasks.</li>
+        <li><strong>Page sections, one at a time</strong> — hero section, then product carousel, then reviews, then FAQ, etc. Each as its own task.</li>
+      </ol>
+
+      <div class="doc-tip">
+        <p><strong>Tip:</strong> The style guide task is critical for new themes. It ensures the pipeline uses your exact colors, fonts, and spacing from the start — rather than guessing from Figma on every section.</p>
+      </div>
+
+      <h3 id="splitting-pages">Splitting Full Pages</h3>
+
+      <p>If you need to build a complete page from scratch, <code>tf split</code> is a great way to do it. It breaks a large task into ordered sub-tasks automatically.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          terminal
+        </div>
+        <pre><code><span class="comment"># Split a full-page task into section-level sub-tasks</span>
+<span class="prompt">$</span> <span class="cmd">tf split</span> <span class="flag">homepage.md</span>
+
+<span class="comment"># For new themes, include style-guide and global tasks</span>
+<span class="prompt">$</span> <span class="cmd">tf split</span> <span class="flag">homepage.md</span> <span class="flag">--new-theme</span>
+
+<span class="comment"># Run all sub-tasks in sequence</span>
+<span class="prompt">$</span> <span class="cmd">tf run</span> <span class="flag">homepage/</span></code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- WRITING TASK FILES -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="writing-tasks">
+      <p class="doc-section-label">Task Files</p>
+      <h2>Keep It Minimal</h2>
+
+      <p>Less is more with task files. If your task already has a Figma link, <strong>don't describe the visual design in words</strong>. The pipeline extracts colors, spacing, typography, and layout directly from Figma — your written description will only compete with it and risk hallucination.</p>
+
+      <p>What to include:</p>
+      <ul>
+        <li><strong>The Figma link</strong> — this is your visual spec</li>
+        <li><strong>Non-obvious behavior</strong> — interactions that aren't visible in a static design</li>
+        <li><strong>Metadata</strong> — theme base, theme name, git branch</li>
+      </ul>
+
+      <p>What to leave out:</p>
+      <ul>
+        <li>Style descriptions (colors, fonts, spacing) when Figma is provided</li>
+        <li>Obvious behaviors the pipeline can infer (e.g., an arrow icon next to a menu item is a submenu)</li>
+        <li>Lengthy explanations — the pipeline understands plain language</li>
+      </ul>
+
+      <h3 id="specify-metadata">Always Specify Metadata</h3>
+
+      <p>Always include <code># Theme Base</code>, <code># Theme Name</code>, and <code># Git Branch</code> in your task files. If you leave these out, the pipeline auto-generates them — and you may end up out of sync with where your work actually lives.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          my-task.md
+        </div>
+        <pre><code><span class="key"># GIT repo</span>
+<span class="str">https://github.com/org/my-store-theme.git</span>
+
+<span class="key"># Theme Base</span>
+<span class="str">Dawn</span>
+
+<span class="key"># Theme Name</span>
+<span class="str">My Store v2</span>
+
+<span class="key"># Git Branch</span>
+<span class="str">feature/homepage-redesign</span>
+
+<span class="key"># Task</span>
+<span class="str">Build the hero section.</span>
+
+<span class="key"># Figma</span>
+<span class="str">Desktop: https://www.figma.com/design/abc?node-id=10-250
+Mobile: https://www.figma.com/design/abc?node-id=10-500</span></code></pre>
+      </div>
+
+      <h3 id="behavior-not-style">Describe Behavior, Not Style</h3>
+
+      <p>Only describe what the pipeline can't see in the Figma. If a section has a non-obvious interaction — a click that triggers a drawer, a hover state that isn't in the static mockup, a carousel with specific autoplay timing — mention it. Otherwise, trust the Figma.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          good task description
+        </div>
+        <pre><code><span class="key"># Task</span>
+<span class="str">Build the featured collections section.
+
+Clicking a collection card opens a quick-view drawer
+with the first 4 products (not a page navigation).
+The carousel auto-plays every 5 seconds on desktop,
+swipe-only on mobile.</span></code></pre>
+      </div>
+
+      <div class="doc-callout">
+        <p><strong>Avoid:</strong> "Use font size 18px with color #333 and 24px padding." If this is in the Figma, the pipeline already knows. Writing it out risks conflicts and hallucination.</p>
+      </div>
+
+      <h3 id="match-detail-to-scope">Match Detail to Scope</h3>
+
+      <p>Not every task needs the same level of detail. <strong>The size of your task should decide how you write it.</strong></p>
+
+      <p>For <strong>full page builds and new sections</strong>, keep it high-level. Provide the Figma links, mention non-obvious behaviors, and let the pipeline figure out the rest. You're painting on a blank canvas — broad strokes work.</p>
+
+      <p>For <strong>bug fixes and small tweaks</strong>, do the opposite. Be surgical. Tell the pipeline <em>exactly</em> what's wrong, where it's happening, and what the fix should look like. Vague descriptions on small tasks lead to the pipeline guessing — and guessing wrong.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          full page build — keep it broad
+        </div>
+        <pre><code><span class="key"># Task</span>
+<span class="str">Build the product page based on the Figma.
+
+# Figma
+Desktop: https://www.figma.com/design/abc?node-id=10-250
+Mobile: https://www.figma.com/design/abc?node-id=10-500</span></code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          bug fix — be precise
+        </div>
+        <pre><code><span class="key"># Task</span>
+<span class="str">The announcement bar text is clipping on mobile
+(viewport under 375px). The container has overflow:hidden
+cutting off the last line. Fix the padding-bottom on
+.announcement-bar__message to give the text room to breathe.</span></code></pre>
+      </div>
+
+      <div class="doc-callout">
+        <p><strong>Rule of thumb:</strong> The smaller the task, the more specific your description should be. A full section build can afford ambiguity — a one-line bug fix cannot.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- FIGMA -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="figma-links">
+      <p class="doc-section-label">Figma</p>
+      <h2>Mobile + Desktop Together</h2>
+
+      <p>For each section, provide <strong>both the desktop and mobile Figma links in the same task</strong>. This gives the pipeline full context for how the section should look on both devices in a single run.</p>
+
+      <p>Splitting them into separate tasks means the mobile task won't have the desktop context (and vice versa) — leading to inconsistent implementations.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          figma links in a task
+        </div>
+        <pre><code><span class="key"># Figma</span>
+<span class="str">Desktop: https://www.figma.com/design/abc?node-id=10-250
+Mobile: https://www.figma.com/design/abc?node-id=10-500</span></code></pre>
+      </div>
+
+      <h3 id="figma-limit">Don't Overload Links</h3>
+
+      <p>Keep Figma links focused. The pipeline downloads and processes the design data for <strong>every link you provide</strong> — too many links bloat the context and slow things down.</p>
+
+      <p>For a single section task, 2 links is ideal (desktop + mobile). Avoid dumping every page and variant into one task file.</p>
+
+      <h3 id="figma-context">Reference Links for Context</h3>
+
+      <p>Sometimes a section needs visual context from an adjacent section to be built correctly. For example, if you're building a floating header, the pipeline needs to see how it overlaps the hero section beneath it.</p>
+
+      <p>In these cases, include the neighboring section's Figma link as a reference — but be intentional about it. The goal is to give the pipeline the full picture, not to flood it with every frame on the page.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          header task with context
+        </div>
+        <pre><code><span class="key"># Task</span>
+<span class="str">Build the floating header section.
+
+Header (Desktop): https://www.figma.com/design/abc?node-id=10-100
+Header (Mobile): https://www.figma.com/design/abc?node-id=10-150
+
+Reference — hero section below the header:
+https://www.figma.com/design/abc?node-id=10-250</span></code></pre>
+      </div>
+
+      <div class="doc-tip">
+        <p><strong>Tip:</strong> Use specific <code>node-id</code> parameters in your Figma URLs. Linking to a specific frame is much more efficient than linking to the entire file.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PIPELINE VS CHAT -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="when-pipeline">
+      <p class="doc-section-label">Pipeline vs Chat</p>
+      <h2>When to Use Pipeline</h2>
+
+      <p>Use <code>tf run</code> (the full pipeline) for <strong>building new things</strong> — creating a section, adding a feature, implementing a design from Figma. The pipeline is intelligent: it understands plain language, reads Figma, plans the implementation, writes code, and validates the output.</p>
+
+      <p>The pipeline is slower but thorough. It goes through multiple agents (context, analyzer, dev, validator) and iterates to get things right. Worth the wait for substantial work.</p>
+
+      <ul>
+        <li>Creating a new section from a Figma design</li>
+        <li>Building a complete component (header, product card, etc.)</li>
+        <li>Any task that needs planning and multi-file changes</li>
+      </ul>
+
+      <h3 id="when-chat">When to Use Chat</h3>
+
+      <p>Use <code>tf chat</code> (the super agent) for <strong>quick, targeted fixes</strong> — padding is off, a color doesn't match, an element needs to be repositioned. Chat is fast but works best with specific instructions.</p>
+
+      <p>Unlike the pipeline, chat doesn't plan or validate — it's a direct conversation with an agent that has full access to your theme. Give it precise details:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          terminal
+        </div>
+        <pre><code><span class="comment"># Start a chat session on the latest repo</span>
+<span class="prompt">$</span> <span class="cmd">tf chat</span> <span class="flag">--latest</span>
+
+<span class="comment"># In chat, be specific:</span>
+<span class="str">"Change the hero section padding to 80px top and 60px bottom"</span>
+<span class="str">"The CTA button color should be #E8251A, not #FF0000"</span>
+<span class="str">"Move the logo 10px to the left in the header"</span></code></pre>
+      </div>
+
+      <div class="doc-tip">
+        <p><strong>Tip:</strong> You can also paste screenshots into chat to show visual bugs. The agent can analyze images and fix what it sees.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- WHILE RUNNING -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="hands-off">
+      <p class="doc-section-label">While Running</p>
+      <h2>Don't Touch Shopify Admin</h2>
+
+      <p>This one is critical. <strong>Never make changes in the Shopify admin while a pipeline task is running.</strong></p>
+
+      <p>Here's why: the pipeline pulls the latest state of your theme from Shopify at the very start of a run. That snapshot becomes the foundation for everything it builds. If you jump into the admin and tweak a setting, reorder sections, or update content mid-run — the pipeline has no idea. It's working off an older version of your theme. When it pushes its changes, <strong>your admin edits get overwritten silently</strong>.</p>
+
+      <p>The timing is simple:</p>
+      <ul>
+        <li><strong>Before</strong> you start a task — make all the admin changes you need</li>
+        <li><strong>During</strong> the task — hands off the Shopify admin entirely</li>
+        <li><strong>After</strong> the task completes — you're free to edit again</li>
+      </ul>
+
+      <div class="doc-callout">
+        <p><strong>Think of it like this:</strong> The pipeline takes a photo of your store at the start. Everything it builds is layered on top of that photo. If you rearrange the furniture while it's working, the final result won't match reality.</p>
+      </div>
+
+      <h3 id="chat-save-warning">Chat &amp; Saving</h3>
+
+      <p>The same principle applies to <code>tf chat</code> — but with a twist. Chat pulls the latest theme state when the session starts, and then <strong>keeps working off that snapshot for the entire conversation</strong>.</p>
+
+      <p>This means: if you save changes in the Shopify admin while a chat session is active, the agent won't see them. It's still working off the version it pulled at the start. Worse — if the agent then pushes its own changes, your admin saves get lost.</p>
+
+      <p>The rule:</p>
+      <ul>
+        <li><strong>Don't save changes in Shopify admin</strong> while a chat session is active</li>
+        <li>If you absolutely need to make an admin change mid-conversation — <strong>quit the chat session first</strong>, make your edits, then start a new chat</li>
+      </ul>
+
+      <div class="doc-tip">
+        <p><strong>Tip:</strong> Starting a fresh chat session is cheap — it only takes a few seconds. Don't risk losing work just to save yourself a restart.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- ITERATION -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="follow-ups">
+      <p class="doc-section-label">Iteration</p>
+      <h2>Follow-Up Tasks</h2>
+
+      <p>A section won't always be perfect in one run. That's expected. <strong>Don't hesitate to create a follow-up task</strong> to refine what was built. The pipeline works incrementally — each run builds on the current state of the theme.</p>
+
+      <h3 id="batch-fixes">Batching Fixes</h3>
+
+      <p>After building 3 or 4 sections, you'll likely have a handful of small issues across them. Instead of creating a fix task for each one, <strong>combine them into a single fix task</strong>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          fixes.md
+        </div>
+        <pre><code><span class="key"># Task</span>
+<span class="str">Fix the following issues:
+
+1. Hero section: CTA button should have rounded corners (8px)
+2. Product carousel: spacing between cards is too tight on mobile
+3. Reviews section: star rating icons are misaligned vertically
+4. Footer: newsletter input field is too narrow on tablet</span></code></pre>
+      </div>
+
+      <h3 id="play-with-emotion">Tone Matters</h3>
+
+      <p>The pipeline responds well to context about what worked and what didn't. If a previous run got 90% right and you're fixing the remaining 10%, <strong>say so</strong>. This tells the pipeline to refine rather than rebuild:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          follow-up task
+        </div>
+        <pre><code><span class="key"># Task</span>
+<span class="str">The hero section from the last run looks great, but it has
+a couple of issues:
+
+1. The background image isn't covering the full viewport height
+2. The subheading font weight should be lighter (300 instead of 400)
+
+Everything else is exactly right — don't change the layout or colors.</span></code></pre>
+      </div>
+
+      <div class="doc-tip">
+        <p><strong>Tip:</strong> Being explicit about what's working prevents the pipeline from over-correcting. "Don't change the layout" is a useful constraint that keeps the scope tight.</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">&copy; 2026 Anatta &middot; An AI Initiative</div>
+  <div class="footer-mark">AGENTIC ANATTA</div>
+</footer>
+
+<script>
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mobile nav toggle
+  const toggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+
+  // Sidebar toggle (mobile)
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+
+  // Close sidebar when clicking a link (mobile)
+  sidebar.querySelectorAll('.sidebar-link').forEach(a => {
+    a.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('open');
+      }
+    });
+  });
+
+  // Active sidebar link on scroll
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  const targets = [];
+  sidebarLinks.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) targets.push({ el, link });
+  });
+
+  function updateActiveSidebarLink() {
+    let current = null;
+    for (const { el, link } of targets) {
+      const top = el.getBoundingClientRect().top;
+      if (top <= 130) {
+        current = link;
+      }
+    }
+    sidebarLinks.forEach(l => l.classList.remove('active'));
+    if (current) current.classList.add('active');
+  }
+
+  window.addEventListener('scroll', updateActiveSidebarLink, { passive: true });
+  updateActiveSidebarLink();
+</script>
+</body>
+</html>

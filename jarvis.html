@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jarvis — Agentic Anatta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8251A;
+    --red-dark: #8B0000;
+    --white: #0D0B09;
+    --blue: #1A3A6B;
+    --gold: #C8860A;
+    --bg: #F5F2EE;
+    --bg2: #E8E4DF;
+    --bg3: #DDD8D2;
+    --text: #0D0B09;
+    --muted: rgba(13,11,9,0.5);
+    --accent: #E8251A;
+    --accent-glow: rgba(232,37,26,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 60px;
+    background: linear-gradient(to bottom, rgba(245,242,238,0.95), transparent);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .nav-shield { width: 36px; height: 36px; }
+
+  .nav-wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .nav-wordmark span {
+    color: var(--red);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    display: block;
+    margin-top: -4px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a.active { color: var(--accent); }
+
+  /* NAV DROPDOWN */
+  .nav-dropdown { position: relative; }
+  .nav-dropdown > a::after {
+    content: ' \25BE';
+    font-size: 9px;
+    opacity: 0.5;
+  }
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    padding: 8px 0;
+    min-width: 180px;
+    border-radius: 4px;
+    list-style: none;
+  }
+  .nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+  .nav-dropdown-menu li a {
+    display: block;
+    padding: 8px 20px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .nav-dropdown-menu li a:hover {
+    background: rgba(0,0,0,0.05);
+  }
+
+  /* HAMBURGER */
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--white);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .nav-toggle.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle.active span:nth-child(2) { opacity: 0; }
+  .nav-toggle.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* HERO */
+  .jarvis-hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 120px 60px 80px;
+    text-align: center;
+  }
+
+  .jarvis-hero-lines {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 40%, var(--accent-glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .jarvis-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    border: 1px solid var(--accent-glow);
+    padding: 6px 16px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  /* JARVIS ICON */
+  .jarvis-icon {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 40px;
+    position: relative;
+    filter: drop-shadow(0 0 40px var(--accent-glow));
+  }
+
+  .jarvis-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 10vw, 120px);
+    letter-spacing: 6px;
+    line-height: 0.9;
+    position: relative;
+  }
+
+  .jarvis-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .jarvis-subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 520px;
+    margin: 24px auto 0;
+    position: relative;
+  }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .divider-line { flex: 1; height: 1px; background: rgba(0,0,0,0.08); }
+
+  .divider-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+  }
+
+  /* FEATURES */
+  .features {
+    padding: 80px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .features-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .features-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .feature-card {
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 44px 32px;
+    border-radius: 4px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--accent-glow);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 24px;
+  }
+
+  .feature-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .feature-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    color: var(--white);
+  }
+
+  .feature-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  /* CALLOUT */
+  .jarvis-callout {
+    padding: 80px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .jarvis-callout-inner {
+    text-align: center;
+    border: 1px solid rgba(232,37,26,0.15);
+    background: rgba(232,37,26,0.02);
+    padding: 56px 40px;
+    border-radius: 4px;
+  }
+
+  .jarvis-callout-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 14px 36px;
+    text-decoration: none;
+    transition: background 0.2s;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover { background: #ff3326; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .footer-mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: rgba(0,0,0,0.18);
+  }
+
+  /* ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* TABLET */
+  @media (max-width: 1024px) {
+    nav { padding: 20px 32px; }
+    .jarvis-hero { padding: 100px 32px 60px; }
+    .features { padding: 60px 32px; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .jarvis-callout { padding: 60px 32px; }
+    footer { padding: 36px 32px; }
+    .divider { padding: 0 32px; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-toggle { display: flex; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--bg2);
+      flex-direction: column;
+      padding: 80px 32px 32px;
+      gap: 24px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 150;
+      border-left: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-links.open { transform: translateX(0); }
+    .nav-links a { font-size: 13px; }
+
+    .nav-dropdown-menu {
+      display: block;
+      position: static;
+      transform: none;
+      background: none;
+      border: none;
+      padding: 0 0 0 16px;
+      min-width: 0;
+    }
+    .nav-dropdown > a::after { display: none; }
+    .nav-dropdown-menu li a { padding: 4px 0; }
+    .nav-dropdown-menu li a:hover { background: none; }
+
+    .jarvis-hero { padding: 100px 20px 60px; }
+    .jarvis-icon { width: 120px; height: 120px; }
+    .jarvis-subtitle { font-size: 14px; max-width: 340px; }
+
+    .features { padding: 60px 20px; }
+    .features-title { font-size: 40px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card { padding: 36px 28px; }
+
+    .jarvis-callout { padding: 40px 20px; }
+    .jarvis-callout-inner { padding: 36px 24px; }
+    .jarvis-callout-text { font-size: 28px; }
+
+    .divider { padding: 0 20px; }
+
+    footer {
+      padding: 32px 20px;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .nav-wordmark { font-size: 15px; }
+    .jarvis-icon { width: 100px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg class="nav-shield" viewBox="165 45 350 350" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="340" cy="220" r="175" fill="#CC1E1E"/>
+      <circle cx="340" cy="220" r="125" fill="#F0F0F0"/>
+      <circle cx="340" cy="220" r="80" fill="#1A3A6B"/>
+      <polygon points="305,275 323,275 360,165 342,165" fill="white"/>
+      <circle cx="368" cy="233" r="15" fill="white"/>
+      <circle cx="340" cy="220" r="175" fill="none" stroke="#8B0000" stroke-width="2.5"/>
+    </svg>
+    <div class="nav-wordmark">
+      Agentic Anatta
+      <span>An AI Initiative</span>
+    </div>
+  </a>
+  <button class="nav-toggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li class="nav-dropdown">
+      <a href="theme-factory.html">Theme Factory</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-theme-factory.html">Docs</a></li>
+        <li><a href="best-practices-theme-factory.html">Best Practices</a></li>
+      </ul>
+    </li>
+    <li class="nav-dropdown">
+      <a href="jarvis.html" class="active">Jarvis</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-jarvis.html">Docs</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="jarvis-hero">
+  <div class="jarvis-hero-lines"></div>
+
+  <span class="jarvis-tag">Slack Agent</span>
+
+  <!-- Stylized Jarvis helmet icon -->
+  <svg class="jarvis-icon" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <!-- Helmet outline -->
+    <path d="M80 15 C45 15 25 50 25 85 C25 120 45 145 80 145 C115 145 135 120 135 85 C135 50 115 15 80 15Z" fill="none" stroke="#E8251A" stroke-width="2" opacity="0.6"/>
+    <!-- Face plate -->
+    <path d="M80 30 C55 30 40 55 40 80 C40 110 55 130 80 130 C105 130 120 110 120 80 C120 55 105 30 80 30Z" fill="none" stroke="#E8251A" stroke-width="1.5" opacity="0.3"/>
+    <!-- Left eye -->
+    <path d="M50 72 L70 68 L72 78 L52 80Z" fill="none" stroke="#4da6ff" stroke-width="2"/>
+    <path d="M50 72 L70 68 L72 78 L52 80Z" fill="#4da6ff" opacity="0.15"/>
+    <!-- Right eye -->
+    <path d="M88 68 L110 72 L108 80 L88 78Z" fill="none" stroke="#4da6ff" stroke-width="2"/>
+    <path d="M88 68 L110 72 L108 80 L88 78Z" fill="#4da6ff" opacity="0.15"/>
+    <!-- Eye glow -->
+    <ellipse cx="62" cy="74" rx="8" ry="4" fill="#4da6ff" opacity="0.4" filter="url(#glow)"/>
+    <ellipse cx="98" cy="74" rx="8" ry="4" fill="#4da6ff" opacity="0.4" filter="url(#glow)"/>
+    <!-- Mouth slit -->
+    <line x1="65" y1="105" x2="95" y2="105" stroke="#E8251A" stroke-width="1" opacity="0.3"/>
+    <!-- Center line -->
+    <line x1="80" y1="30" x2="80" y2="105" stroke="#E8251A" stroke-width="0.5" opacity="0.2"/>
+    <!-- Glow filter -->
+    <defs>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <h1 class="jarvis-title"><em>Jarvis</em></h1>
+
+  <p class="jarvis-subtitle">
+    Your engineering communication agent. Lives in Slack, speaks your team's language, and turns conversations into action. One of us.
+  </p>
+</section>
+
+<!-- FEATURES -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <span class="divider-label">001</span>
+  <div class="divider-line"></div>
+</div>
+
+<section class="features" id="features">
+  <div class="features-header reveal">
+    <p class="features-label">Capabilities</p>
+    <h2 class="features-title">What Jarvis Does</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="feature-name">Engineering Q&A</div>
+      <p class="feature-desc">Lives in Slack and answers engineering questions in real time. Understands your codebase, your tools, and your team's context. Ask anything — Jarvis responds like a senior engineer who's been on the team for years.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="feature-name">GitHub Issues</div>
+      <p class="feature-desc">Conversations become action. When a bug surfaces or a task is identified, Jarvis raises GitHub issues directly from Slack — capturing the full context of the discussion so nothing gets lost in translation.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div class="feature-name">Tool Assistance</div>
+      <p class="feature-desc">Helps your team use other Agentic Anatta tools like Theme Factory. Need help writing a task file? Want to understand a command? Jarvis guides you through it right in Slack.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CALLOUT -->
+<div class="jarvis-callout reveal">
+  <div class="jarvis-callout-inner">
+    <p class="jarvis-callout-text">Jarvis is part of the team.</p>
+    <p style="font-size:14px;color:rgba(13,11,9,0.5);line-height:1.8;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">Not a bot. Not a chatbot. An engineering agent that understands context, takes action, and gets better with every conversation.</p>
+    <a href="index.html#tools" class="btn-primary">Back to Arsenal</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">&copy; 2026 Anatta &middot; An AI Initiative</div>
+  <div class="footer-mark">AGENTIC ANATTA</div>
+</footer>
+
+<script>
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 120);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mobile nav toggle
+  const toggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>

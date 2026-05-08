@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Theme Factory — Agentic Anatta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8251A;
+    --red-dark: #8B0000;
+    --white: #0D0B09;
+    --blue: #1A3A6B;
+    --gold: #C8860A;
+    --bg: #F5F2EE;
+    --bg2: #E8E4DF;
+    --bg3: #DDD8D2;
+    --text: #0D0B09;
+    --muted: rgba(13,11,9,0.5);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 60px;
+    background: linear-gradient(to bottom, rgba(245,242,238,0.95), transparent);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .nav-shield { width: 36px; height: 36px; }
+
+  .nav-wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .nav-wordmark span {
+    color: var(--red);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    display: block;
+    margin-top: -4px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a.active { color: var(--red); }
+
+  /* NAV DROPDOWN */
+  .nav-dropdown { position: relative; }
+  .nav-dropdown > a::after {
+    content: ' \25BE';
+    font-size: 9px;
+    opacity: 0.5;
+  }
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    padding: 8px 0;
+    min-width: 180px;
+    border-radius: 4px;
+    list-style: none;
+  }
+  .nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+  .nav-dropdown-menu li a {
+    display: block;
+    padding: 8px 20px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .nav-dropdown-menu li a:hover {
+    background: rgba(0,0,0,0.05);
+  }
+
+  /* HAMBURGER */
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--white);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .nav-toggle.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle.active span:nth-child(2) { opacity: 0; }
+  .nav-toggle.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* HERO */
+  .tf-hero {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 140px 60px 80px;
+    text-align: center;
+  }
+
+  .tf-hero::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -55%);
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(232,37,26,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tf-hero-lines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.04) 3px,
+      rgba(0,0,0,0.04) 4px
+    );
+    pointer-events: none;
+  }
+
+  .tf-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    border: 1px solid rgba(232,37,26,0.3);
+    padding: 6px 16px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .tf-icon {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.3s;
+    filter: drop-shadow(0 0 30px rgba(232,37,26,0.25));
+  }
+
+  .tf-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    letter-spacing: 4px;
+    line-height: 0.95;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.4s;
+  }
+
+  .tf-title em {
+    font-style: normal;
+    color: var(--red);
+  }
+
+  .tf-subtitle {
+    margin-top: 24px;
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.8;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.6s;
+  }
+
+  .tf-hero-cta {
+    margin-top: 40px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.8s;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* TERMINAL PREVIEW */
+  .terminal-wrap {
+    margin-top: 64px;
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 1s;
+  }
+
+  .terminal {
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .terminal-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.14);
+  }
+
+  .terminal-bar span {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-left: 8px;
+  }
+
+  .terminal-body {
+    padding: 20px 24px;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+
+  .terminal-body .prompt { color: var(--red); }
+  .terminal-body .cmd { color: var(--white); }
+  .terminal-body .flag { color: rgba(232,37,26,0.6); }
+  .terminal-body .comment { color: rgba(13,11,9,0.25); font-style: italic; }
+  .terminal-body .success { color: #4ade80; }
+
+  .tf-callout {
+    padding: 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .tf-callout-inner {
+    border: 1px solid rgba(232,37,26,0.2);
+    padding: 48px 40px;
+    background: rgba(232,37,26,0.03);
+  }
+
+  .tf-callout-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 24px;
+  }
+
+  .tf-callout-cmd {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    color: var(--red);
+    background: rgba(232,37,26,0.1);
+    padding: 12px 32px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .tf-callout-cmd .prompt {
+    color: var(--muted);
+    margin-right: 8px;
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: #c01510; transform: translateY(-2px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid rgba(13,11,9,0.25);
+    padding: 14px 36px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--white); color: var(--white); }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 60px;
+    margin: 0 auto;
+    max-width: 1200px;
+  }
+  .divider-line { flex: 1; height: 1px; background: rgba(0,0,0,0.10); }
+  .divider-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* FEATURES */
+  .features {
+    padding: 100px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-header { margin-bottom: 60px; }
+
+  .features-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .features-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .feature-card {
+    background: var(--bg3);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .feature-card:hover { background: #C8C3BC; }
+  .feature-card:hover::before { transform: scaleX(1); }
+
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 20px;
+    display: block;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(232,37,26,0.08);
+    border-radius: 8px;
+  }
+
+  .feature-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--red);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .feature-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  /* WORKFLOW */
+  .workflow {
+    padding: 100px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .workflow-header { margin-bottom: 60px; }
+
+  .workflow-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .workflow-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .workflow-steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    position: relative;
+  }
+
+  .workflow-step {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 32px;
+    padding: 32px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    align-items: start;
+  }
+
+  .workflow-step:last-child { border-bottom: none; }
+
+  .step-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: rgba(232,37,26,0.2);
+    line-height: 1;
+  }
+
+  .step-content {}
+
+  .step-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .step-cmd {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--red);
+    background: rgba(232,37,26,0.08);
+    padding: 6px 14px;
+    border-radius: 4px;
+  }
+
+  /* TECH STACK */
+  .tech {
+    padding: 80px 60px 120px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .tech-header { margin-bottom: 48px; }
+
+  .tech-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .tech-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .tech-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border: 1px solid rgba(0,0,0,0.10);
+    padding: 10px 20px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .tech-pill:hover {
+    border-color: var(--red);
+    color: var(--white);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .footer-mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: rgba(0,0,0,0.18);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* TABLET */
+  @media (max-width: 1024px) {
+    nav { padding: 20px 32px; }
+    .tf-hero { padding: 120px 32px 60px; }
+    .tf-callout { padding: 48px 32px; }
+    .features { padding: 80px 32px; }
+    .workflow { padding: 80px 32px; }
+    .tech { padding: 60px 32px 80px; }
+    .divider { padding: 0 32px; }
+    footer { padding: 36px 32px; }
+
+    .features-title, .workflow-title, .tech-title { font-size: 44px; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-toggle { display: flex; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--bg2);
+      flex-direction: column;
+      padding: 80px 32px 32px;
+      gap: 24px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 150;
+      border-left: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-links.open { transform: translateX(0); }
+    .nav-links a { font-size: 13px; }
+
+    .nav-dropdown-menu {
+      display: block;
+      position: static;
+      transform: none;
+      background: none;
+      border: none;
+      padding: 0 0 0 16px;
+      min-width: 0;
+    }
+    .nav-dropdown > a::after { display: none; }
+    .nav-dropdown-menu li a { padding: 4px 0; }
+    .nav-dropdown-menu li a:hover { background: none; }
+
+    .tf-hero { padding: 100px 20px 40px; }
+    .tf-subtitle { font-size: 14px; }
+    .tf-hero-cta { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-ghost { width: 100%; max-width: 280px; text-align: center; }
+
+    .terminal { font-size: 11px; }
+    .terminal-body { padding: 16px 18px; }
+
+    .tf-callout { padding: 40px 20px; }
+    .tf-callout-inner { padding: 36px 24px; }
+    .tf-callout-text { font-size: 24px; }
+    .tf-callout-cmd { font-size: 15px; padding: 10px 24px; }
+    .features { padding: 60px 20px; }
+    .features-title, .workflow-title, .tech-title { font-size: 40px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card { padding: 36px 28px; }
+
+    .workflow { padding: 60px 20px; }
+    .workflow-step { grid-template-columns: 48px 1fr; gap: 20px; padding: 24px 0; }
+    .step-number { font-size: 36px; }
+
+    .tech { padding: 40px 20px 60px; }
+    .divider { padding: 0 20px; }
+
+    footer {
+      padding: 32px 20px;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .terminal-body { font-size: 10px; padding: 14px 14px; }
+    .nav-wordmark { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg class="nav-shield" viewBox="165 45 350 350" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="340" cy="220" r="175" fill="#CC1E1E"/>
+      <circle cx="340" cy="220" r="125" fill="#F0F0F0"/>
+      <circle cx="340" cy="220" r="80" fill="#1A3A6B"/>
+      <polygon points="305,275 323,275 360,165 342,165" fill="white"/>
+      <circle cx="368" cy="233" r="15" fill="white"/>
+      <circle cx="340" cy="220" r="175" fill="none" stroke="#8B0000" stroke-width="2.5"/>
+    </svg>
+    <div class="nav-wordmark">
+      Agentic Anatta
+      <span>An AI Initiative</span>
+    </div>
+  </a>
+  <button class="nav-toggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li class="nav-dropdown">
+      <a href="theme-factory.html" class="active">Theme Factory</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-theme-factory.html">Docs</a></li>
+        <li><a href="best-practices-theme-factory.html">Best Practices</a></li>
+      </ul>
+    </li>
+    <li class="nav-dropdown">
+      <a href="jarvis.html">Jarvis</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-jarvis.html">Docs</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="tf-hero">
+  <div class="tf-hero-lines"></div>
+
+  <span class="tf-tag" data-version="themeFactory">CLI Tool</span>
+
+  <!-- Theme Factory icon: factory building with code -->
+  <svg class="tf-icon" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+    <!-- Chimney smoke (subtle) -->
+    <path d="M38 28 Q36 20 40 14" fill="none" stroke="#E8251A" stroke-width="1" opacity="0.25" stroke-linecap="round"/>
+    <path d="M44 30 Q42 18 46 10" fill="none" stroke="#E8251A" stroke-width="1" opacity="0.2" stroke-linecap="round"/>
+    <!-- Chimneys -->
+    <rect x="34" y="30" width="6" height="18" fill="none" stroke="#E8251A" stroke-width="1.5" opacity="0.5"/>
+    <rect x="44" y="34" width="6" height="14" fill="none" stroke="#E8251A" stroke-width="1.5" opacity="0.5"/>
+    <!-- Factory roof (saw-tooth) -->
+    <path d="M24 48 L54 48 L54 60 L74 48 L74 60 L94 48 L116 48 L116 60 L24 60Z" fill="none" stroke="#E8251A" stroke-width="1.5" opacity="0.6"/>
+    <!-- Factory body -->
+    <rect x="24" y="60" width="92" height="56" fill="none" stroke="#E8251A" stroke-width="1.5" opacity="0.6"/>
+    <!-- Factory base line -->
+    <line x1="18" y1="116" x2="122" y2="116" stroke="#E8251A" stroke-width="1.5" opacity="0.4"/>
+    <!-- Code brackets inside factory -->
+    <path d="M48 78 L36 90 L48 102" fill="none" stroke="#E8251A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M92 78 L104 90 L92 102" fill="none" stroke="#E8251A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Forward slash -->
+    <line x1="76" y1="74" x2="64" y2="106" stroke="#E8251A" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <!-- Glow behind code -->
+    <ellipse cx="70" cy="90" rx="30" ry="16" fill="#E8251A" opacity="0.04"/>
+    <!-- Window dots on factory -->
+    <circle cx="30" cy="68" r="2" fill="#E8251A" opacity="0.3"/>
+    <circle cx="110" cy="68" r="2" fill="#E8251A" opacity="0.3"/>
+  </svg>
+
+  <h1 class="tf-title">Theme <em>Factory</em></h1>
+
+  <p class="tf-subtitle">
+    Autonomous Shopify theme engineering CLI by Anatta.
+    Describe what you want in plain English — Theme Factory builds it.
+  </p>
+
+  <div class="tf-hero-cta">
+    <a href="#install" class="btn-primary">Get Started</a>
+    <a href="docs-theme-factory.html" class="btn-ghost">Documentation</a>
+  </div>
+
+  <div class="terminal-wrap">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <span>terminal</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="comment"># Install Theme Factory</span></div>
+        <div><span class="prompt">$</span> <span class="cmd">npm install -g @anattadesign/theme-factory</span></div>
+        <br/>
+        <div><span class="comment"># Run a task — builds, commits, pushes to GitHub + Shopify</span></div>
+        <div><span class="prompt">$</span> <span class="cmd">tf run</span> <span class="flag">./my-first-task.md</span></div>
+        <div><span class="success">&#10003; Theme updated and pushed to your-store.myshopify.com</span></div>
+        <br/>
+        <div><span class="comment"># Or use interactive chat mode</span></div>
+        <div><span class="prompt">$</span> <span class="cmd">tf chat</span></div>
+        <div><span class="success">&#10003; Chat session started</span></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- FEATURES -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <span class="divider-label">001</span>
+  <div class="divider-line"></div>
+</div>
+
+<section class="features" id="features">
+  <div class="features-header reveal">
+    <p class="features-label">Capabilities</p>
+    <h2 class="features-title">Features</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="feature-name">Plain English</div>
+      <p class="feature-desc">Describe what you want in simple English. Theme Factory translates your intent into production-ready Shopify theme code.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+      </div>
+      <div class="feature-name">Figma Replication</div>
+      <p class="feature-desc">Point Theme Factory at a Figma file and it replicates the complete design as a functional Shopify theme with 96% accuracy.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="feature-name">90% Faster</div>
+      <p class="feature-desc">Reduce Shopify theme development time by 90%. What used to take days now takes minutes with autonomous code generation.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <div class="feature-name">Auto Content</div>
+      <p class="feature-desc">Automatically updates theme content. Push changes to Shopify and GitHub in a single pipeline run.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <div class="feature-name">Shared Memory</div>
+      <p class="feature-desc">Remembers client-specific development patterns and shared learnings. Gets smarter with every project it builds.</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h6"/></svg>
+      </div>
+      <div class="feature-name">Interactive Chat</div>
+      <p class="feature-desc">Use tf chat for interactive task building and live fixes. Build themes conversationally without writing a task file.</p>
+    </div>
+  </div>
+</section>
+
+<div class="tf-callout reveal">
+  <div class="tf-callout-inner">
+    <p class="tf-callout-text">Ready to get started?</p>
+    <p style="font-size:14px;color:rgba(13,11,9,0.5);line-height:1.8;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">Full CLI reference, task format, super agent guide, and everything you need to start building.</p>
+    <a href="docs-theme-factory.html" class="btn-primary">Read the Docs</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">© 2026 Anatta · An AI Initiative</div>
+  <div class="footer-mark">AGENTIC ANATTA</div>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-version]').forEach(el => {
+    const key = el.dataset.version;
+    const ver = window.TOOL_VERSIONS[key];
+    if (ver) el.textContent = 'CLI Tool · ' + ver;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 120);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  const toggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Docs — Jarvis — Agentic Anatta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8251A;
+    --red-dark: #8B0000;
+    --white: #0D0B09;
+    --blue: #1A3A6B;
+    --gold: #C8860A;
+    --bg: #F5F2EE;
+    --bg2: #E8E4DF;
+    --bg3: #DDD8D2;
+    --text: #0D0B09;
+    --muted: rgba(13,11,9,0.5);
+    --sidebar-w: 260px;
+  }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 60px;
+    background: rgba(245,242,238,0.97);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+  }
+
+  .nav-shield { width: 36px; height: 36px; }
+
+  .nav-wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+
+  .nav-wordmark span {
+    color: var(--red);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 2px;
+    display: block;
+    margin-top: -4px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a.active { color: var(--red); }
+
+  /* NAV DROPDOWN */
+  .nav-dropdown { position: relative; }
+  .nav-dropdown > a::after {
+    content: ' \25BE';
+    font-size: 9px;
+    opacity: 0.5;
+  }
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    padding: 8px 0;
+    min-width: 180px;
+    border-radius: 4px;
+    list-style: none;
+  }
+  .nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+  .nav-dropdown-menu li a {
+    display: block;
+    padding: 8px 20px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .nav-dropdown-menu li a:hover {
+    background: rgba(0,0,0,0.05);
+  }
+
+  /* HAMBURGER */
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--white);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .nav-toggle.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle.active span:nth-child(2) { opacity: 0; }
+  .nav-toggle.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* LAYOUT */
+  .docs-layout {
+    display: flex;
+    margin-top: 85px;
+    min-height: calc(100vh - 85px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    position: fixed;
+    top: 85px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    padding: 32px 24px 60px;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    background: var(--bg);
+    z-index: 50;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+
+  .sidebar-group { margin-bottom: 28px; }
+
+  .sidebar-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 12px;
+  }
+
+  .sidebar-link {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 12px;
+    border-left: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .sidebar-link:hover { color: var(--white); }
+  .sidebar-link.active {
+    color: var(--white);
+    border-left-color: var(--red);
+  }
+
+  .sidebar-link code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* MOBILE SIDEBAR TOGGLE */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 200;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--red);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(232,37,26,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* CONTENT */
+  .docs-content {
+    flex: 1;
+    margin-left: var(--sidebar-w);
+    padding: 48px 60px 120px;
+    max-width: 900px;
+  }
+
+  /* HERO */
+  .docs-hero {
+    margin-bottom: 64px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .docs-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    border: 1px solid rgba(232,37,26,0.3);
+    padding: 6px 16px;
+    margin-bottom: 24px;
+  }
+
+  .docs-hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: 3px;
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .docs-hero-title em {
+    font-style: normal;
+    color: var(--red);
+  }
+
+  .docs-hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 520px;
+  }
+
+  /* SECTION HEADINGS */
+  .doc-section {
+    margin-bottom: 64px;
+  }
+
+  .doc-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .doc-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+
+  .doc-section h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .doc-section h3:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .doc-section h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  /* PROSE */
+  .doc-section p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .doc-section p strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .doc-section ul, .doc-section ol {
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+
+  .doc-section li {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .doc-section li strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .doc-section a {
+    color: var(--red);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .doc-section a:hover {
+    color: var(--white);
+  }
+
+  /* INLINE CODE */
+  .doc-section code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: rgba(232,37,26,0.08);
+    color: var(--red);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid rgba(0,0,0,0.10);
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .code-block-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .code-block-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.14);
+  }
+
+  .code-block pre {
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgba(13,11,9,0.7);
+  }
+
+  .code-block pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+  }
+
+  .code-block .prompt { color: var(--red); }
+  .code-block .cmd { color: var(--white); }
+  .code-block .flag { color: rgba(232,37,26,0.6); }
+  .code-block .comment { color: rgba(13,11,9,0.3); font-style: italic; }
+  .code-block .success { color: #4ade80; }
+  .code-block .key { color: var(--red); }
+  .code-block .str { color: rgba(13,11,9,0.6); }
+  .code-block .user { color: var(--blue); }
+  .code-block .jarvis { color: var(--red); }
+
+  /* TABLES */
+  .doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+
+  .doc-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    font-weight: 500;
+  }
+
+  .doc-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: var(--muted);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+
+  .doc-table td code {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: rgba(232,37,26,0.08);
+    color: var(--red);
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .doc-table tr:hover td { background: rgba(0,0,0,0.03); }
+
+  /* CALLOUT */
+  .doc-callout {
+    border: 1px solid rgba(232,37,26,0.2);
+    background: rgba(232,37,26,0.03);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+
+  .doc-callout p {
+    margin-bottom: 0;
+  }
+
+  .doc-callout strong {
+    color: var(--red);
+  }
+
+  /* DIVIDER */
+  .doc-divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 48px 0;
+  }
+
+  .doc-divider-line { flex: 1; height: 1px; background: rgba(0,0,0,0.08); }
+
+  .doc-divider-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: var(--sidebar-w);
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .footer-mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: rgba(0,0,0,0.18);
+  }
+
+  /* ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* TABLET */
+  @media (max-width: 1024px) {
+    nav { padding: 20px 32px; }
+    .sidebar { width: 220px; min-width: 220px; padding: 24px 16px 60px; }
+    .docs-content { margin-left: 220px; padding: 40px 32px 100px; }
+    footer { margin-left: 220px; padding: 36px 32px; }
+    .doc-section h2 { font-size: 34px; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-toggle { display: flex; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--bg2);
+      flex-direction: column;
+      padding: 80px 32px 32px;
+      gap: 24px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 150;
+      border-left: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-links.open { transform: translateX(0); }
+    .nav-links a { font-size: 13px; }
+
+    .nav-dropdown-menu {
+      display: block;
+      position: static;
+      transform: none;
+      background: none;
+      border: none;
+      padding: 0 0 0 16px;
+      min-width: 0;
+    }
+    .nav-dropdown > a::after { display: none; }
+    .nav-dropdown-menu li a { padding: 4px 0; }
+    .nav-dropdown-menu li a:hover { background: none; }
+
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      width: 280px;
+      min-width: 280px;
+      z-index: 90;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-toggle { display: flex; }
+
+    .docs-content { margin-left: 0; padding: 32px 20px 80px; }
+    footer { margin-left: 0; padding: 32px 20px; flex-direction: column; gap: 12px; text-align: center; }
+
+    .docs-hero-title { font-size: 40px; }
+    .doc-section h2 { font-size: 30px; }
+    .doc-section h3 { font-size: 22px; }
+
+    .doc-table { font-size: 12px; }
+    .doc-table th, .doc-table td { padding: 8px 10px; }
+
+    .code-block pre { font-size: 11px; padding: 14px 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .docs-hero-title { font-size: 32px; }
+    .code-block pre { font-size: 10px; padding: 12px 14px; }
+    .doc-table { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg class="nav-shield" viewBox="165 45 350 350" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="340" cy="220" r="175" fill="#CC1E1E"/>
+      <circle cx="340" cy="220" r="125" fill="#F0F0F0"/>
+      <circle cx="340" cy="220" r="80" fill="#1A3A6B"/>
+      <polygon points="305,275 323,275 360,165 342,165" fill="white"/>
+      <circle cx="368" cy="233" r="15" fill="white"/>
+      <circle cx="340" cy="220" r="175" fill="none" stroke="#8B0000" stroke-width="2.5"/>
+    </svg>
+    <div class="nav-wordmark">
+      Agentic Anatta
+      <span>An AI Initiative</span>
+    </div>
+  </a>
+  <button class="nav-toggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li class="nav-dropdown">
+      <a href="theme-factory.html">Theme Factory</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-theme-factory.html">Docs</a></li>
+        <li><a href="best-practices-theme-factory.html">Best Practices</a></li>
+      </ul>
+    </li>
+    <li class="nav-dropdown">
+      <a href="jarvis.html">Jarvis</a>
+      <ul class="nav-dropdown-menu">
+        <li><a href="docs-jarvis.html" class="active">Docs</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Getting Started</div>
+    <a href="#what-is-jarvis" class="sidebar-link">What Is Jarvis</a>
+    <a href="#talking-to-jarvis" class="sidebar-link">Talking to Jarvis</a>
+    <a href="#first-interaction" class="sidebar-link">First Interaction</a>
+    <a href="#quick-tour" class="sidebar-link">Quick Tour</a>
+    <a href="#what-jarvis-wont-do" class="sidebar-link">What Jarvis Won't Do</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Company Knowledge</div>
+    <a href="#asking-questions" class="sidebar-link">Asking Questions</a>
+    <a href="#knowledge-domains" class="sidebar-link">Knowledge Domains</a>
+    <a href="#adding-sources" class="sidebar-link">Adding Sources</a>
+    <a href="#saving-to-domain" class="sidebar-link">Saving to Domain Knowledge</a>
+    <a href="#syncing" class="sidebar-link">Syncing</a>
+    <a href="#visibility" class="sidebar-link">Visibility</a>
+    <a href="#how-search-works" class="sidebar-link">How Search Works</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">GitHub Issues</div>
+    <a href="#searching-issues" class="sidebar-link">Searching Issues</a>
+    <a href="#creating-issues" class="sidebar-link">Creating Issues</a>
+    <a href="#closing-issues" class="sidebar-link">Closing &amp; Reopening</a>
+    <a href="#commenting-on-issues" class="sidebar-link">Commenting</a>
+    <a href="#shield-notifications" class="sidebar-link">SHIELD Notifications</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Scheduling</div>
+    <a href="#one-time-reminders" class="sidebar-link">One-Time Reminders</a>
+    <a href="#recurring-tasks" class="sidebar-link">Recurring Tasks</a>
+    <a href="#timezone" class="sidebar-link">Timezone</a>
+    <a href="#managing-schedules" class="sidebar-link">Managing Schedules</a>
+    <a href="#frequency-limits" class="sidebar-link">Frequency Limits</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Private Knowledge</div>
+    <a href="#private-sources" class="sidebar-link">Private Sources</a>
+    <a href="#personal-notebook" class="sidebar-link">Personal Notebook</a>
+    <a href="#notebook-vs-private" class="sidebar-link">Notebook vs Private Knowledge</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Templates</div>
+    <a href="#generating-documents" class="sidebar-link">Generating Documents</a>
+    <a href="#listing-templates" class="sidebar-link">Listing Templates</a>
+    <a href="#setting-up-templates" class="sidebar-link">Setting Up Templates</a>
+  </div>
+</aside>
+
+<!-- SIDEBAR TOGGLE (mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle docs navigation">
+  &#9776;
+</button>
+
+<!-- CONTENT -->
+<main class="docs-layout">
+  <div class="docs-content">
+
+    <!-- HERO -->
+    <div class="docs-hero">
+      <span class="docs-tag">Slack Agent</span>
+      <h1 class="docs-hero-title"><em>Jarvis</em> Docs</h1>
+      <p class="docs-hero-sub">
+        Complete guide to Jarvis — company knowledge, GitHub issues, scheduling, private notes, and document templates. All through Slack.
+      </p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- GETTING STARTED -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="what-is-jarvis">
+      <p class="doc-section-label">Getting Started</p>
+      <h2>What Is Jarvis</h2>
+
+      <p>Jarvis is Anatta's AI-powered internal assistant, available on Slack. Your go-to for company knowledge, IT help, HR policies, project tracking, reminders, and more — all through natural conversation.</p>
+
+      <p>Think of Jarvis as a teammate who has read every internal doc, knows every process, and is available 24/7.</p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Task</th><th>Without Jarvis</th><th>With Jarvis</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>"What's our leave policy?"</strong></td>
+            <td>Search Confluence, find the right page, read through it</td>
+            <td>Ask Jarvis, get the answer in seconds</td>
+          </tr>
+          <tr>
+            <td><strong>"How do I reset my Mac password?"</strong></td>
+            <td>Ping the IT team, wait for a response</td>
+            <td>Ask Jarvis, get step-by-step instructions</td>
+          </tr>
+          <tr>
+            <td><strong>"Log a bug about checkout crashing"</strong></td>
+            <td>Open GitHub, write the issue, tag the team</td>
+            <td>Tell Jarvis, it creates the issue and notifies the team</td>
+          </tr>
+          <tr>
+            <td><strong>"Remind me to follow up on Friday"</strong></td>
+            <td>Set a calendar reminder manually</td>
+            <td>Tell Jarvis, it DMs you at the right time</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc-section reveal" id="talking-to-jarvis">
+      <h2>Talking to Jarvis</h2>
+
+      <h3>Direct Messages</h3>
+      <p>Open a DM with <strong>@Jarvis</strong> in Slack. Best for:</p>
+      <ul>
+        <li>Sensitive questions (salary, personal docs)</li>
+        <li>Private knowledge searches</li>
+        <li>Personal reminders</li>
+        <li>Anything you wouldn't ask in a public channel</li>
+      </ul>
+
+      <h3>In Channels</h3>
+      <p>Tag <strong>@Jarvis</strong> in any channel where the bot is invited. Jarvis always replies in a thread to keep the channel clean.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="cmd">@Jarvis</span> what's the VPN setup process?</code></pre>
+      </div>
+
+      <h3>Mid-Thread</h3>
+      <p>Already in a conversation? Tag <strong>@Jarvis</strong> in the thread — it reads the entire thread history for context before responding.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack · #engineering
+        </div>
+        <pre><code><span class="comment">[Team discussing a deploy issue]</span>
+<span class="cmd">@Jarvis</span> what does Theme Factory's deploy pipeline do when validation fails?</code></pre>
+      </div>
+
+      <p>Jarvis reads the thread, understands the context, searches the knowledge base, and responds with relevant information.</p>
+    </section>
+
+    <section class="doc-section reveal" id="first-interaction">
+      <h2>First Interaction</h2>
+      <p>The first time you message Jarvis, it auto-registers you:</p>
+      <ul>
+        <li>Pulls your <strong>email</strong> and <strong>timezone</strong> from Slack</li>
+        <li>Sets you as a <strong>member</strong> (default role)</li>
+        <li>You're ready to go — no setup needed</li>
+      </ul>
+    </section>
+
+    <section class="doc-section reveal" id="quick-tour">
+      <h2>Quick Tour</h2>
+
+      <h3>Ask About Company Knowledge</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> what's our parental leave policy?
+
+<span class="jarvis">Jarvis:</span> Anatta offers up to 4 weeks of paid parental leave for birth,
+adoption, or foster care placement. Submit requests through HR at
+least 30 days in advance.</code></pre>
+      </div>
+
+      <h3>Get IT Help</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> my Mac is overheating, what should I do?
+
+<span class="jarvis">Jarvis:</span> Here's the troubleshooting guide:
+1. Check Activity Monitor for CPU-heavy processes
+2. Reset SMC (Intel) or restart (Apple Silicon)
+3. Clean vents and ensure proper ventilation
+4. If persistent, contact IT at it@anattadesign.com</code></pre>
+      </div>
+
+      <h3>Set a Reminder</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> remind me at 3pm to review the PR
+
+<span class="jarvis">Jarvis:</span> Done — I'll remind you at 3:00 PM IST.</code></pre>
+      </div>
+
+      <h3>Save a Note</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> remember that we decided to use Stripe for payments
+
+<span class="jarvis">Jarvis:</span> Saved to your notebook.</code></pre>
+      </div>
+
+      <h3>Log a GitHub Issue</h3>
+      <div class="doc-callout">
+        <p><strong>Channel restriction:</strong> GitHub tools work in AI team channels for regular users. Admins can use them from any channel.</p>
+      </div>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack · #engineering
+        </div>
+        <pre><code><span class="user">You:</span> log an issue: checkout page crashes when discount code has special characters
+
+<span class="jarvis">Jarvis:</span> Created #158: "Checkout crash with special characters in discount code"
+Notified the SHIELD team. One of the Avengers should get in touch with you soon.</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="what-jarvis-wont-do">
+      <h2>What Jarvis Won't Do</h2>
+      <p>Jarvis is strictly for Anatta work. It politely declines:</p>
+      <ul>
+        <li>Personal coding projects ("write unit tests for my side project")</li>
+        <li>Homework or learning exercises</li>
+        <li>General AI assistant tasks ("write me a poem")</li>
+        <li>Anything unrelated to Anatta's work, tools, or processes</li>
+      </ul>
+    </section>
+
+    <div class="doc-divider">
+      <div class="doc-divider-line"></div>
+      <span class="doc-divider-label">COMPANY KNOWLEDGE</span>
+      <div class="doc-divider-line"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- COMPANY KNOWLEDGE -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="asking-questions">
+      <p class="doc-section-label">Company Knowledge</p>
+      <h2>Asking Questions</h2>
+
+      <p>Just ask naturally. Jarvis figures out the right domain and searches for you:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> how do I request a new laptop?
+
+<span class="jarvis">Jarvis:</span> Here's the process from the IT team:
+1. Fill out the Laptop Request Form (link in the IT portal)
+2. Get approval from your manager
+3. IT team processes requests within 3-5 business days
+4. Pickup from the Mumbai office or shipped to your address</code></pre>
+      </div>
+
+      <h3>Searching Specific Domains</h3>
+      <p>If Jarvis picks the wrong domain, be explicit:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> search engineering knowledge for deploy pipeline
+<span class="user">You:</span> search hr for maternity leave
+<span class="user">You:</span> search it-infra for VPN setup</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="knowledge-domains">
+      <h2>Knowledge Domains</h2>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Domain</th><th>What's In It</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>engineering</strong></td><td>Code architecture, Theme Factory, CI/CD, debugging guides</td></tr>
+          <tr><td><strong>ux</strong></td><td>Design system, Figma workflows, brand guidelines</td></tr>
+          <tr><td><strong>sales-marketing</strong></td><td>Sales processes, campaign materials, client onboarding</td></tr>
+          <tr><td><strong>hr</strong></td><td>Leave policies, benefits, handbook, hiring, performance</td></tr>
+          <tr><td><strong>it-infra</strong></td><td>Mac setup, VPN, password resets, tool access, MDM</td></tr>
+          <tr><td><strong>leadership</strong></td><td>Strategy docs, OKRs, quarterly planning</td></tr>
+          <tr><td><strong>cxo</strong></td><td>Board materials, executive reports</td></tr>
+          <tr><td><strong>general</strong></td><td>Company-wide policies, org-wide announcements</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc-section reveal" id="adding-sources">
+      <h2>Adding Knowledge Sources</h2>
+
+      <p>Anyone can suggest sources. Domain heads and admins can add them to shared domains.</p>
+
+      <h3>Google Drive Folder</h3>
+      <p>The most common source — point Jarvis at a Drive folder and it indexes everything inside. Subfolders are included automatically.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add this Drive folder to it-infra knowledge:
+     https://drive.google.com/drive/folders/1ABC123xyz
+
+<span class="jarvis">Jarvis:</span> Added Google Drive folder to it-infra. Sync triggered —
+        I'll DM you when it's done.</code></pre>
+      </div>
+
+      <h3>Google Docs</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add this doc to hr knowledge:
+     https://docs.google.com/document/d/1ABC123/edit
+
+<span class="jarvis">Jarvis:</span> Added "Employee Handbook 2026" to hr domain.</code></pre>
+      </div>
+
+      <h3>GitHub Repository</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add the docs folder from anattadesign/theme-factory to engineering
+
+<span class="jarvis">Jarvis:</span> Added GitHub source — will index .md and .mdx files from docs/.</code></pre>
+      </div>
+
+      <h3>Confluence Wiki</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add Confluence space ENG from https://anatta.atlassian.net/wiki
+     to engineering knowledge
+
+<span class="jarvis">Jarvis:</span> Added Confluence space ENG. 42 pages found.</code></pre>
+      </div>
+
+      <h3>Website</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add https://agentic.anatta.io/docs/theme-factory to engineering
+
+<span class="jarvis">Jarvis:</span> Added website source. Page will be split by sections for
+        better search accuracy.</code></pre>
+      </div>
+
+      <h3>GitHub Issues</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add GitHub issues from anattadesign/jarvis to engineering
+
+<span class="jarvis">Jarvis:</span> Added — will index open and closed issues.</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="saving-to-domain">
+      <h2>Saving to Domain Knowledge</h2>
+
+      <p>Domain heads and admins can ask Jarvis to add content to existing files in a domain's Google Drive folder:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> save this to engineering knowledge: The new deploy pipeline
+     requires approval from two reviewers before merging to main.
+
+<span class="jarvis">Jarvis:</span> Which file would you like me to save to? You have:
+        - Engineering Runbook
+        - Deploy Guide
+        - Architecture Notes
+
+<span class="user">You:</span> Deploy Guide
+
+<span class="jarvis">Jarvis:</span> Saved to "Deploy Guide" in engineering. It will be
+        searchable after the next sync.</code></pre>
+      </div>
+
+      <div class="doc-callout">
+        <p><strong>Rules:</strong> Domain heads and admins only — regular members cannot save to domain folders. Existing files only — Jarvis cannot create new files. Writable formats only — Google Docs, .txt, and .md files.</p>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="syncing">
+      <h2>Syncing</h2>
+
+      <p>Knowledge sources sync automatically every <strong>6 hours</strong>. To sync immediately:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> sync engineering knowledge
+
+<span class="jarvis">Jarvis:</span> Sync triggered for engineering. I'll DM you when it's done.</code></pre>
+      </div>
+
+      <p><strong>"Skipped" files</strong> are those that haven't changed since last sync, or file types Jarvis can't read (images, videos). Jarvis indexes Google Docs, Sheets, Slides, PDFs, .docx, .pptx, and plain text files. Embedded images are ignored — only text is extracted.</p>
+    </section>
+
+    <section class="doc-section reveal" id="visibility">
+      <h2>Visibility</h2>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Level</th><th>Who Can Search</th><th>Use Case</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Domain</strong> (default)</td>
+            <td>Everyone in that domain + admins</td>
+            <td>Team-specific docs</td>
+          </tr>
+          <tr>
+            <td><strong>Public</strong></td>
+            <td>Everyone in the company</td>
+            <td>Company-wide documents (e.g. employee handbook)</td>
+          </tr>
+          <tr>
+            <td><strong>Private</strong></td>
+            <td>Owner only, DMs only</td>
+            <td>Personal documents</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc-section reveal" id="how-search-works">
+      <h2>How Search Works</h2>
+
+      <p>When you ask a question, Jarvis:</p>
+      <ol>
+        <li>Converts your question into a <strong>semantic embedding</strong></li>
+        <li>Searches the vector database for the most relevant documents (not keyword matching — actual meaning)</li>
+        <li>Sends only the top matching documents to the AI</li>
+        <li>Answers based on those specific documents</li>
+      </ol>
+
+      <p>This means questions like "how do I reset my password" will find the "Mac Password Reset Guide" even if you didn't use the exact title. If the answer isn't in the knowledge base, Jarvis says so clearly instead of guessing.</p>
+    </section>
+
+    <div class="doc-divider">
+      <div class="doc-divider-line"></div>
+      <span class="doc-divider-label">GITHUB ISSUES</span>
+      <div class="doc-divider-line"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- GITHUB ISSUES -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="searching-issues">
+      <p class="doc-section-label">GitHub Issues</p>
+      <h2>Searching Issues</h2>
+
+      <div class="doc-callout">
+        <p><strong>Channel restriction:</strong> GitHub tools work in AI team channels (#engineering, #ai-test, #shield) for regular users. Admins and super admins can use them from any channel.</p>
+      </div>
+
+      <p>Find issues by description, assignee, or state:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> find open issues about checkout
+
+<span class="jarvis">Jarvis:</span> Found 3 matching issues:
+  #142 — Checkout crashes with special chars in discount code (open)
+  #138 — Checkout timeout on slow connections (open)
+  #131 — Add Apple Pay to checkout (open, labeled: enhancement)</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> show me details on issue 142
+
+<span class="jarvis">Jarvis:</span> #142 — Checkout crashes with special chars in discount code
+  State: open | Author: @jane | Labels: bug, high-priority
+  Created: Apr 3 | Updated: Apr 5
+
+  Steps to reproduce:
+  1. Add item to cart
+  2. Enter discount code with &amp; or % character
+  3. Click "Apply" — page crashes with 500 error</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="creating-issues">
+      <h2>Creating Issues</h2>
+
+      <p>Tell Jarvis what the issue is — it handles the rest:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack · #engineering
+        </div>
+        <pre><code><span class="user">You:</span> log an issue: the product page shows wrong pricing
+     when currency is set to EUR
+
+<span class="jarvis">Jarvis:</span> Created #159: "Product page shows wrong pricing in EUR currency"
+        Notified the SHIELD team.</code></pre>
+      </div>
+
+      <h3>What Happens Behind the Scenes</h3>
+      <ol>
+        <li><strong>Duplicate check</strong> — Jarvis searches all open issues first. If a similar one exists, it tells you instead of creating a duplicate.</li>
+        <li><strong>Issue creation</strong> — Title, description, and any error details from your conversation are included.</li>
+        <li><strong>Metadata</strong> — "Reported by: Your Name (your@email.com)" is automatically added.</li>
+        <li><strong>Notification</strong> — The SHIELD channel gets an alert so the engineering team sees it.</li>
+      </ol>
+
+      <h3>Duplicate Prevention</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> log an issue: checkout crashes with special characters
+
+<span class="jarvis">Jarvis:</span> This looks like it might be a duplicate of #142
+        "Checkout crashes with special chars in discount code" (open).
+        Want me to add your info as a comment on the existing issue instead?</code></pre>
+      </div>
+
+      <p>If you insist, Jarvis escalates to the super admins rather than creating a duplicate.</p>
+    </section>
+
+    <section class="doc-section reveal" id="closing-issues">
+      <h2>Closing &amp; Reopening Issues</h2>
+
+      <h3>Closing</h3>
+      <p>Requires team lead or higher. Jarvis always adds an explanatory comment when closing:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> close issue 142 — fixed in PR #167, deployed to production
+
+<span class="jarvis">Jarvis:</span> Closed #142 with comment:
+        "Fixed in PR #167, deployed to production.
+         Closure requested by Jane (jane@anattadesign.com)."</code></pre>
+      </div>
+
+      <h3>Reopening</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> reopen issue 142 — still happening in production after the fix
+
+<span class="jarvis">Jarvis:</span> Reopened #142 with comment explaining the reason.
+        SHIELD team notified.</code></pre>
+      </div>
+
+      <p>Admins can reopen directly. Regular users need to provide a valid reason, and Jarvis may escalate to admins if the reason isn't clear.</p>
+    </section>
+
+    <section class="doc-section reveal" id="commenting-on-issues">
+      <h2>Commenting on Issues</h2>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> comment on issue 142: tested on staging, confirmed the fix works
+
+<span class="jarvis">Jarvis:</span> Added comment to #142.</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="shield-notifications">
+      <h2>SHIELD Notifications</h2>
+
+      <p>SHIELD is the internal alert channel for the engineering team. Jarvis posts there when:</p>
+      <ul>
+        <li>A new issue is created</li>
+        <li>An issue is reopened</li>
+        <li>A duplicate dispute needs admin review</li>
+      </ul>
+
+      <p>You can also post directly:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> notify shield: deployment to production is blocked,
+     CI pipeline failing on main branch
+
+<span class="jarvis">Jarvis:</span> Posted to SHIELD.</code></pre>
+      </div>
+    </section>
+
+    <div class="doc-divider">
+      <div class="doc-divider-line"></div>
+      <span class="doc-divider-label">SCHEDULING &amp; REMINDERS</span>
+      <div class="doc-divider-line"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCHEDULING & REMINDERS -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="one-time-reminders">
+      <p class="doc-section-label">Scheduling &amp; Reminders</p>
+      <h2>One-Time Reminders</h2>
+
+      <p>Simple notifications delivered at a specific time:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> remind me at 3pm to review the PR
+
+<span class="jarvis">Jarvis:</span> Done — I'll remind you at 3:00 PM IST.
+
+<span class="comment">[At 3:00 PM]</span>
+<span class="jarvis">Jarvis (DM):</span> Reminder: Review the PR</code></pre>
+      </div>
+
+      <p>More examples:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code>remind me tomorrow at 10am to follow up with the client
+remind me Friday at 5pm to submit the weekly report
+set a reminder for April 15 at 9am: file quarterly taxes</code></pre>
+      </div>
+
+      <p>Reminders are delivered as simple DM notifications — no AI processing, just the message you set.</p>
+    </section>
+
+    <section class="doc-section reveal" id="recurring-tasks">
+      <h2>Recurring Tasks</h2>
+
+      <p>Recurring tasks run on a schedule and are processed by the AI agent each time, so they can do more than just remind — they can fetch data, generate reports, and take actions.</p>
+
+      <h3>Daily Standup Summary</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> every weekday at 9am, give me a summary of open GitHub issues
+     assigned to the engineering team
+
+<span class="jarvis">Jarvis:</span> Scheduled — runs Mon-Fri at 9:00 AM IST.
+
+<span class="comment">[Every weekday morning]</span>
+<span class="jarvis">Jarvis (DM):</span> Here are today's open engineering issues:
+  - #159 Product page pricing bug (high priority, 2 days old)
+  - #156 Update TF docs (low priority)
+  - #142 Checkout crash — reopened yesterday
+  3 open issues, 1 high priority.</code></pre>
+      </div>
+
+      <h3>Weekly Digest</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> every Monday at 10am, check what knowledge sources
+     were synced in the last week and if any failed
+
+<span class="jarvis">Jarvis:</span> Scheduled — runs every Monday at 10:00 AM IST.</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="timezone">
+      <h2>Timezone</h2>
+
+      <p>All times are interpreted in <strong>your local timezone</strong>. Jarvis reads your timezone from your Slack profile. If it's wrong, update it:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> set my timezone to America/New_York
+<span class="user">You:</span> my timezone is Asia/Kolkata
+<span class="user">You:</span> I'm in London</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="managing-schedules">
+      <h2>Managing Schedules</h2>
+
+      <h3>List Active Schedules</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> list my schedules
+
+<span class="jarvis">Jarvis:</span> You have 3 active schedules:
+  1. Daily at 9:00 AM — GitHub issues summary (recurring)
+  2. Mon at 10:00 AM — Weekly sync digest (recurring)
+  3. Apr 15 at 9:00 AM — File quarterly taxes (one-time)</code></pre>
+      </div>
+
+      <h3>Cancel a Schedule</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> cancel schedule 2
+
+<span class="jarvis">Jarvis:</span> Cancelled "Weekly sync digest".</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="frequency-limits">
+      <h2>Frequency Limits</h2>
+
+      <p>To prevent abuse, recurring task frequency is limited by role:</p>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th>Role</th><th>Maximum Frequency</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Member</strong></td><td>Once per day (daily, weekly, etc.)</td></tr>
+          <tr><td><strong>Admin</strong></td><td>Up to hourly</td></tr>
+          <tr><td><strong>Super Admin</strong></td><td>Any frequency</td></tr>
+        </tbody>
+      </table>
+
+      <p>All users can have up to <strong>25 active recurring tasks</strong>.</p>
+    </section>
+
+    <div class="doc-divider">
+      <div class="doc-divider-line"></div>
+      <span class="doc-divider-label">PRIVATE KNOWLEDGE &amp; NOTES</span>
+      <div class="doc-divider-line"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PRIVATE KNOWLEDGE & NOTES -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="private-sources">
+      <p class="doc-section-label">Private Knowledge &amp; Notes</p>
+      <h2>Private Knowledge Sources</h2>
+
+      <p>Add personal documents that only you can search. These are never visible to anyone else and only accessible in DMs with Jarvis.</p>
+
+      <h3>Adding Private Sources</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack · DM
+        </div>
+        <pre><code><span class="user">You:</span> save this for me:
+     https://drive.google.com/drive/folders/1MyPersonalDocs
+
+<span class="jarvis">Jarvis:</span> Added as your private knowledge source. Syncing now —
+        I'll let you know when it's ready.</code></pre>
+      </div>
+
+      <h3>Searching Private Knowledge</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack · DM
+        </div>
+        <pre><code><span class="user">You:</span> what's in my personal docs about compensation?
+
+<span class="jarvis">Jarvis:</span> From your private documents:
+        Your current CTC is &#8377;12,00,000 per annum...</code></pre>
+      </div>
+
+      <h3>Supported File Types</h3>
+      <ul>
+        <li><strong>Google Docs</strong> — exported as text</li>
+        <li><strong>Google Sheets</strong> — exported as CSV</li>
+        <li><strong>Google Slides</strong> — slide text and speaker notes</li>
+        <li><strong>PDFs</strong> — text-based PDFs (scanned/image PDFs are skipped)</li>
+        <li><strong>Word documents (.docx)</strong> — full text extraction</li>
+        <li><strong>PowerPoint (.pptx)</strong> — slide text and speaker notes</li>
+        <li><strong>Plain text, Markdown, CSV</strong> — read directly</li>
+      </ul>
+
+      <h3>Security</h3>
+      <ul>
+        <li><strong>DMs only</strong> — Private knowledge is blocked in channels</li>
+        <li><strong>Encrypted at rest</strong> — All private document content is encrypted with AES-256</li>
+        <li><strong>Owner only</strong> — No one else can search, view, or manage your private sources. Not even admins.</li>
+        <li><strong>Stays private</strong> — Cannot be changed to domain or public visibility</li>
+      </ul>
+
+      <h3>Saving to Private Knowledge</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack · DM
+        </div>
+        <pre><code><span class="user">You:</span> save this to my knowledge: We decided to go with Razorpay
+     for India payments. Integration deadline is May 15.
+
+<span class="jarvis">Jarvis:</span> Which file would you like me to save to? You have:
+        - My details
+        - Paul's secret
+
+<span class="user">You:</span> My details
+
+<span class="jarvis">Jarvis:</span> Saved to "My details". It will be searchable after the next sync.</code></pre>
+      </div>
+
+      <div class="doc-callout">
+        <p><strong>Rules:</strong> Existing files only — create files yourself in Drive first. Writable formats only — Google Docs, .txt, and .md. DMs only — saving to private knowledge is blocked in channels.</p>
+      </div>
+
+      <h3>Storage Limits</h3>
+      <p>Each user has a storage limit for private knowledge (default: <strong>10,000 characters</strong> across all sources). If your documents exceed the limit, Jarvis automatically summarizes them to fit and notifies you. All key facts, numbers, and details are preserved.</p>
+    </section>
+
+    <section class="doc-section reveal" id="personal-notebook">
+      <h2>Personal Notebook</h2>
+
+      <p>A lightweight note-taking system for quick things you want Jarvis to remember. Think of it as a personal sticky note board.</p>
+
+      <h3>Saving Notes</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> remember that we decided to use Stripe for payments
+
+<span class="jarvis">Jarvis:</span> Saved to your notebook.</code></pre>
+      </div>
+
+      <p>Jarvis also saves notes proactively when something important comes up in conversation — a decision, a preference, a key detail — so you don't have to ask.</p>
+
+      <h3>Searching Notes</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> what did I save about payments?
+
+<span class="jarvis">Jarvis:</span> You noted: "We decided to use Stripe for payments" (saved Apr 7)</code></pre>
+      </div>
+
+      <h3>Listing &amp; Deleting Notes</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> list my notes
+
+<span class="jarvis">Jarvis:</span> Your notebook (5 notes):
+  1. We decided to use Stripe for payments (Apr 7)
+  2. Mike's desk extension is 4201 (Apr 5)
+  3. Staging server password in 1Password under "Anatta Staging" (Apr 3)
+  4. Sprint retro every other Friday at 4pm (Mar 28)
+  5. Design review feedback: simplify the onboarding flow (Mar 25)
+
+<span class="user">You:</span> delete note 2
+
+<span class="jarvis">Jarvis:</span> Deleted: "Mike's desk extension is 4201"</code></pre>
+      </div>
+
+      <h3>Storage &amp; Privacy</h3>
+      <p>You can save up to <strong>100 notes</strong>. Notes are strictly private — only you can read, search, or delete them. Jarvis never reveals your notes to other users. Notes are loaded into your conversations so Jarvis remembers what you saved, in both DMs and channels.</p>
+
+      <div class="doc-callout">
+        <p><strong>Note:</strong> Notebook entries are stored as plain text in the database (not encrypted), unlike private knowledge which uses AES-256 encryption.</p>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="notebook-vs-private">
+      <h2>Notebook vs Private Knowledge</h2>
+
+      <table class="doc-table">
+        <thead>
+          <tr><th></th><th>Notebook</th><th>Private Knowledge</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>What it's for</strong></td>
+            <td>Quick notes, decisions, facts</td>
+            <td>Documents and external sources</td>
+          </tr>
+          <tr>
+            <td><strong>How you add</strong></td>
+            <td>"remember this..." / "save note..."</td>
+            <td>"save this URL for me"</td>
+          </tr>
+          <tr>
+            <td><strong>Source types</strong></td>
+            <td>Free text only</td>
+            <td>Google Drive, Docs, Sheets, Slides, PDF, .docx, .pptx</td>
+          </tr>
+          <tr>
+            <td><strong>Search</strong></td>
+            <td>Keyword matching</td>
+            <td>Semantic (AI-powered)</td>
+          </tr>
+          <tr>
+            <td><strong>Where it works</strong></td>
+            <td>DMs and channels</td>
+            <td>DMs only</td>
+          </tr>
+          <tr>
+            <td><strong>Storage limit</strong></td>
+            <td>100 notes</td>
+            <td>Per-user character limit</td>
+          </tr>
+          <tr>
+            <td><strong>Encryption</strong></td>
+            <td>No (plain text)</td>
+            <td>Yes (AES-256)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="doc-divider">
+      <div class="doc-divider-line"></div>
+      <span class="doc-divider-label">TEMPLATES &amp; DOCUMENTS</span>
+      <div class="doc-divider-line"></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TEMPLATES & DOCUMENTS -->
+    <!-- ============================================================ -->
+
+    <section class="doc-section reveal" id="generating-documents">
+      <p class="doc-section-label">Templates &amp; Documents</p>
+      <h2>Generating Documents</h2>
+
+      <p>Jarvis can generate documents from pre-defined templates — offer letters, onboarding checklists, reports, and any other repeatable document. Templates are Google Docs with placeholder fields that Jarvis fills and delivers as <code>.docx</code> files in Slack.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> generate an offer letter for Rahul Kumar,
+     starting May 1, salary 15 LPA, role: Senior Engineer
+
+<span class="jarvis">Jarvis:</span> Generated "Offer Letter — Rahul Kumar"
+        [offer-letter-rahul-kumar.docx]</code></pre>
+      </div>
+
+      <h3>Auto-Filled Fields</h3>
+      <p>Jarvis automatically fills common fields from your profile and context:</p>
+      <ul>
+        <li><code>{employee_name}</code> — from your request</li>
+        <li><code>{email}</code> — from user profile</li>
+        <li><code>{date}</code>, <code>{month}</code>, <code>{year}</code> — current date</li>
+        <li><code>{manager_name}</code> — from context if available</li>
+      </ul>
+
+      <p>It only asks for values it can't figure out:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> generate an NDA for the Acme project
+
+<span class="jarvis">Jarvis:</span> I need a few details for the NDA:
+  - Client company name?
+  - Project scope?
+  - Duration (months)?
+
+<span class="user">You:</span> Acme Corp, e-commerce redesign, 6 months
+
+<span class="jarvis">Jarvis:</span> Generated "NDA — Acme Corp"
+        [nda-acme-corp.docx]</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="listing-templates">
+      <h2>Listing Templates</h2>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> list hr templates
+
+<span class="jarvis">Jarvis:</span> HR Templates:
+  1. Offer Letter — fields: employee_name, role, salary, start_date
+  2. NDA — fields: client_name, project_scope, duration
+  3. Onboarding Checklist — fields: employee_name, team, manager_name</code></pre>
+      </div>
+    </section>
+
+    <section class="doc-section reveal" id="setting-up-templates">
+      <h2>Setting Up Templates (Admin)</h2>
+
+      <h3>Creating a Template</h3>
+      <p>Create a Google Doc with placeholder fields in curly braces:</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          google doc template
+        </div>
+        <pre><code>Dear {employee_name},
+
+We are pleased to offer you the position of {role} at Anatta,
+starting {start_date}, with a compensation of {salary} per annum.</code></pre>
+      </div>
+
+      <p>Then tell Jarvis to register it:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add template "Offer Letter" from
+     https://docs.google.com/document/d/1ABC123
+     for hr domain
+
+<span class="jarvis">Jarvis:</span> Added template "Offer Letter" to hr domain.
+        Detected fields: employee_name, role, start_date, salary</code></pre>
+      </div>
+
+      <p>Fields are auto-detected from the document — no manual configuration needed.</p>
+
+      <h3>Access Control</h3>
+      <p>Templates can require a minimum role to generate:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> add template "Board Report" from docs.google.com/...
+     for cxo domain, min role: admin
+
+<span class="jarvis">Jarvis:</span> Added "Board Report" to cxo. Only admins and above can generate.</code></pre>
+      </div>
+
+      <h3>Updating &amp; Removing Templates</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          <div class="code-block-dot"></div>
+          slack
+        </div>
+        <pre><code><span class="user">You:</span> update the offer letter template: set min role to head_of_domain
+
+<span class="jarvis">Jarvis:</span> Updated — "Offer Letter" now requires head_of_domain or above.
+
+<span class="user">You:</span> remove the NDA template
+
+<span class="jarvis">Jarvis:</span> Removed "NDA" from hr templates.</code></pre>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">&copy; 2026 Anatta &middot; An AI Initiative</div>
+  <div class="footer-mark">AGENTIC ANATTA</div>
+</footer>
+
+<script>
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mobile nav toggle
+  const toggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+
+  // Sidebar toggle (mobile)
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+
+  // Close sidebar when clicking a link (mobile)
+  sidebar.querySelectorAll('.sidebar-link').forEach(a => {
+    a.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('open');
+      }
+    });
+  });
+
+  // Active sidebar link on scroll
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  const targets = [];
+  sidebarLinks.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) targets.push({ el, link });
+  });
+
+  function updateActiveSidebarLink() {
+    let current = null;
+    for (const { el, link } of targets) {
+      const top = el.getBoundingClientRect().top;
+      if (top <= 130) {
+        current = link;
+      }
+    }
+    sidebarLinks.forEach(l => l.classList.remove('active'));
+    if (current) current.classList.add('active');
+  }
+
+  window.addEventListener('scroll', updateActiveSidebarLink, { passive: true });
+  updateActiveSidebarLink();
+</script>
+</body>
+</html>
