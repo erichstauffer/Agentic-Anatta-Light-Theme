@@ -795,7 +795,7 @@
 <script>
   document.querySelectorAll('[data-version]').forEach(el => {
     const key = el.dataset.version;
-    const ver = window.TOOL_VERSIONS[key];
+    const ver = (window.TOOL_VERSIONS || {})[key];
     if (ver) el.textContent = ver;
   });
 

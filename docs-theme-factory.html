@@ -2122,7 +2122,7 @@ The sticky behavior uses position: sticky with a
   // Version injection
   document.querySelectorAll('[data-version]').forEach(el => {
     const key = el.dataset.version;
-    const ver = window.TOOL_VERSIONS[key];
+    const ver = (window.TOOL_VERSIONS || {})[key];
     if (ver) el.textContent = 'CLI Tool · ' + ver;
   });
 
